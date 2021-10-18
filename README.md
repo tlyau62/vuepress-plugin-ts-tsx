@@ -20,6 +20,7 @@ module.exports = {
     [
       'vuepress-plugin-ts-tsx',
       {
+        // Plugin options
         tsLoaderOptions(opts) {
           return {
             ...opts,

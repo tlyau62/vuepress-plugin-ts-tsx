@@ -4,16 +4,22 @@ import { merge, identity } from 'lodash';
 import Config from 'webpack-chain';
 
 export interface TypescriptPluginOptions {
-  tsLoaderOptions: Partial<TsLoader.Options>;
-  babelLoaderOptions?: any;
+  tsLoaderOptions?(opts: Partial<TsLoader.Options>): Partial<TsLoader.Options>;
+  babelLoaderOptions?(opts: Config.LoaderOptions): Config.LoaderOptions;
   chainWebpack?(config: Config): void;
 }
 
+export const defaultTsLoaderOptions: Partial<TsLoader.Options> = {
+  transpileOnly: true,
+};
+
+export const defaultBabelLoaderOptions: any = {
+  configFile: true,
+};
+
 const TsTsxPlugin: Plugin<TypescriptPluginOptions> = ({
-  tsLoaderOptions,
-  babelLoaderOptions = {
-    configFile: true,
-  },
+  tsLoaderOptions = identity,
+  babelLoaderOptions = identity,
   chainWebpack = identity,
 }) => ({
   name: 'vuepress-plugin-ts-tsx',
@@ -51,14 +57,20 @@ const TsTsxPlugin: Plugin<TypescriptPluginOptions> = ({
       .test(/\.ts$/)
       .use('babel-loader')
       .loader('babel-loader')
-      .tap((opts) => merge(opts, babelLoaderOptions))
+      .tap(
+        (opts) =>
+          babelLoaderOptions(merge(opts, defaultBabelLoaderOptions)) || opts
+      )
       .end()
       .use('ts-loader')
       .loader('ts-loader')
-      .tap((opts) =>
-        merge(opts, tsLoaderOptions, {
-          appendTsSuffixTo: [/.vue$/, /.md$/],
-        })
+      .tap(
+        (opts) =>
+          tsLoaderOptions(
+            merge(opts, defaultTsLoaderOptions, {
+              appendTsSuffixTo: [/.vue$/, /.md$/],
+            })
+          ) || opts
       )
       .end();
 
@@ -67,14 +79,20 @@ const TsTsxPlugin: Plugin<TypescriptPluginOptions> = ({
       .test(/\.tsx$/)
       .use('babel-loader')
       .loader('babel-loader')
-      .tap((opts) => merge(opts, babelLoaderOptions))
+      .tap(
+        (opts) =>
+          babelLoaderOptions(merge(opts, defaultBabelLoaderOptions)) || opts
+      )
       .end()
       .use('ts-loader')
       .loader('ts-loader')
-      .tap((opts) =>
-        merge(opts, tsLoaderOptions, {
-          appendTsxSuffixTo: [/.vue$/, /.md$/],
-        })
+      .tap(
+        (opts) =>
+          tsLoaderOptions(
+            merge(opts, defaultTsLoaderOptions, {
+              appendTsxSuffixTo: [/.vue$/, /.md$/],
+            })
+          ) || opts
       )
       .end();
 

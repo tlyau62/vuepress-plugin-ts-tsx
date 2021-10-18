@@ -1,11 +1,21 @@
 import TsLoader from 'ts-loader';
 import { Plugin } from 'vuepress-types';
+import { merge, identity } from 'lodash';
+import Config from 'webpack-chain';
 
 export interface TypescriptPluginOptions {
   tsLoaderOptions: Partial<TsLoader.Options>;
+  babelLoaderOptions?: any;
+  chainWebpack?(config: Config): void;
 }
 
-const TsTsxPlugin: Plugin<TypescriptPluginOptions> = () => ({
+const TsTsxPlugin: Plugin<TypescriptPluginOptions> = ({
+  tsLoaderOptions,
+  babelLoaderOptions = {
+    configFile: true,
+  },
+  chainWebpack = identity,
+}) => ({
   name: 'vuepress-plugin-ts-tsx',
 
   /**
@@ -39,11 +49,17 @@ const TsTsxPlugin: Plugin<TypescriptPluginOptions> = () => ({
     config.module
       .rule('ts')
       .test(/\.ts$/)
+      .use('babel-loader')
+      .loader('babel-loader')
+      .tap((opts) => merge(opts, babelLoaderOptions))
+      .end()
       .use('ts-loader')
       .loader('ts-loader')
-      .options({
-        appendTsSuffixTo: [/.vue$/, /.md$/],
-      })
+      .tap((opts) =>
+        merge(opts, tsLoaderOptions, {
+          appendTsSuffixTo: [/.vue$/, /.md$/],
+        })
+      )
       .end();
 
     config.module
@@ -51,13 +67,18 @@ const TsTsxPlugin: Plugin<TypescriptPluginOptions> = () => ({
       .test(/\.tsx$/)
       .use('babel-loader')
       .loader('babel-loader')
+      .tap((opts) => merge(opts, babelLoaderOptions))
       .end()
       .use('ts-loader')
       .loader('ts-loader')
-      .options({
-        appendTsxSuffixTo: [/.vue$/, /.md$/],
-      })
+      .tap((opts) =>
+        merge(opts, tsLoaderOptions, {
+          appendTsxSuffixTo: [/.vue$/, /.md$/],
+        })
+      )
       .end();
+
+    chainWebpack(config);
   },
 });
 

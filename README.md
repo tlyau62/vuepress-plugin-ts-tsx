@@ -51,6 +51,21 @@ module.exports = {
   });
   ```
 
+### babelLoaderOptions
+
+- **Type**: `(opts: Config.LoaderOptions): Config.LoaderOptions`
+
+- **Description**
+
+  The argument `opts` is the default babel loader options. By default, the opts will be merged with `{configFile: true}`. You may change it by returning a new option. Here is an example.
+
+  ```ts
+  const babelLoaderOptions = (opts) => ({
+    ...opts,
+    configFile: false,
+  });
+  ```
+
 ## TODO
 
 1. add ts-loader config option

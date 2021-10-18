@@ -17,10 +17,39 @@ npm i vuepress-plugin-ts-tsx
 module.exports = {
   plugins: [
     // ...
-    ['vuepress-plugin-ts-tsx'],
+    [
+      'vuepress-plugin-ts-tsx',
+      {
+        tsLoaderOptions(opts) {
+          return {
+            ...opts,
+            transpileOnly: false,
+          };
+        },
+      },
+    ],
+
+    // or simply ['vuepress-plugin-ts-tsx']
   ],
 };
 ```
+
+## Plugin options
+
+### tsLoaderOptions
+
+- **Type**: `(opts: Partial<TsLoader.Options>) => Partial<TsLoader.Options>`
+
+- **Description**
+
+  The argument `opts` is the default ts loader options. By default, the opts will be merged with `{transpileOnly: true}`. You may change it by returning a new option. Here is an example.
+
+  ```ts
+  const tsLoaderOptions = (opts) => ({
+    ...opts,
+    transpileOnly: false,
+  });
+  ```
 
 ## TODO
 

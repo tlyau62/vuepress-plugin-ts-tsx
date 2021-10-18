@@ -66,8 +66,15 @@ module.exports = {
   });
   ```
 
+### chainWebpack
+
+- **Type**: `(config: Config): void`
+
+- **Description**
+
+  The chain webpack function. You may add your customized chain webpack function.
+
 ## TODO
 
-1. add ts-loader config option
 2. add support on enhanceApp.ts
 3. add cache loader
